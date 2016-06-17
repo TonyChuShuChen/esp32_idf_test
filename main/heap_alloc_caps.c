@@ -1,7 +1,7 @@
 #include <osapi.h>
 #include <ets_sys.h>
 #include "heap_alloc_caps.h"
-#include <heap_regions.h>
+#include <freertos/heap_regions.h>
 
 #include "spiram.h"
 
