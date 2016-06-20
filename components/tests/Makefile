@@ -7,4 +7,13 @@
 # please read the SDK documents if you need to do this.
 #
 
+COMPONENT_EXTRA_CLEAN := test_tjpgd_logo.h
+
 include $(SDK_PATH)/Makefile
+
+test_tjpgd.o: test_tjpgd_logo.h
+
+test_tjpgd_logo.h: $(COMPONENT_PATH)/logo.jpg
+	$(vecho) XXD logo.jpg
+	$(Q) cd $(COMPONENT_PATH); xxd -i logo.jpg $(COMPONENT_BUILD_DIR)/test_tjpgd_logo.h
+
