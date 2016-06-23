@@ -25,16 +25,9 @@
 #include <math.h>
 #include "unity.h"
 
-#define USE_I2S1 1
-
-//HACK!!! to use i2s1 instead of i2s0.
-#if USE_I2S1
-#undef DR_REG_I2S_BASE
-//#define DR_REG_I2S_BASE DR_REG_I2S1_BASE
-#define DR_REG_I2S_BASE 0x6002D000
-#endif
 #include <i2s/i2s_reg.h>
 
+#include "periph_i2s.h"
 
 
 static int qsintab[256]={
@@ -156,36 +149,43 @@ static void lcdIfaceInit() {
 	WRITE_PERI_REG(GPIO_FUNC11_OUT_SEL_CFG, READ_PERI_REG(GPIO_FUNC11_OUT_SEL_CFG)|GPIO_GPIO_FUNC11_OUT_INV_SEL);
 
 	//Reset I2S subsystem
-	CLEAR_PERI_REG_MASK(I2SCONF,I2S_I2S_RX_RESET|I2S_I2S_TX_RESET);
-	SET_PERI_REG_MASK(I2SCONF,I2S_I2S_RX_RESET|I2S_I2S_TX_RESET);
-	CLEAR_PERI_REG_MASK(I2SCONF,I2S_I2S_RX_RESET|I2S_I2S_TX_RESET);
-	
-	WRITE_PERI_REG(I2SCONF, 0);
-	WRITE_PERI_REG(I2SCONF2, I2S_LCD_EN);
+	I2S0.CONF.fld.rx_reset=1; I2S0.CONF.fld.tx_reset=1;
+	I2S0.CONF.fld.rx_reset=0; I2S0.CONF.fld.tx_reset=0;
 
-	WRITE_PERI_REG(I2S_SAMPLE_RATE_CONF, 
-			(16<<I2S_RX_BITS_MOD_S)|
-			(16<<I2S_TX_BITS_MOD_S)|
-			(4<<I2S_RX_BCK_DIV_NUM_S)|
-			(4<<I2S_TX_BCK_DIV_NUM_S));
-	WRITE_PERI_REG(I2S_CLKM_CONF, 
-			I2S_CLKA_ENA|I2S_CLK_EN|
-			(0<<I2S_CLKM_DIV_A_S)|
-			(0<<I2S_CLKM_DIV_B_S)|
-			(8<<I2S_CLKM_DIV_NUM_S));
-	WRITE_PERI_REG(I2S_FIFO_CONF, 
-			(1<<I2S_I2S_RX_FIFO_MOD_S)|		//FIFO mode.
-			(1<<I2S_I2S_TX_FIFO_MOD_S)|
-			(32<<I2S_I2S_TX_DATA_NUM_S)|		//Low watermark for IRQ
-			(32<<I2S_I2S_RX_DATA_NUM_S));
+	I2S0.CONF2.val=0;
+	I2S0.CONF2.fld.lcd_en=1;
 
-	WRITE_PERI_REG(I2SCONF1, I2S_I2S_TX_STOP_EN|I2S_RX_PCM_BYPASS|I2S_TX_PCM_BYPASS);
+	I2S0.SAMPLE_RATE_CONF.fld.rx_bits_mod=16;
+	I2S0.SAMPLE_RATE_CONF.fld.tx_bits_mod=16;
+	I2S0.SAMPLE_RATE_CONF.fld.rx_bck_div_num=4;
+	I2S0.SAMPLE_RATE_CONF.fld.tx_bck_div_num=4;
 
-	WRITE_PERI_REG(I2SCONF_CHAN, (1<<I2S_TX_CHAN_MOD_S)|(1<<I2S_RX_CHAN_MOD_S));
+	I2S0.CLKM_CONF.val=0;
+	I2S0.CLKM_CONF.fld.clka_ena=1;
+	I2S0.CLKM_CONF.fld.clk_en=1;
+	I2S0.CLKM_CONF.fld.clkm_div_a=0;
+	I2S0.CLKM_CONF.fld.clkm_div_b=0;
+	I2S0.CLKM_CONF.fld.clkm_div_num=8;
+
+	I2S0.FIFO_CONF.val=0;
+	I2S0.FIFO_CONF.fld.rx_fifo_mod=1;
+	I2S0.FIFO_CONF.fld.tx_fifo_mod=1;
+	I2S0.FIFO_CONF.fld.rx_data_num=32;
+	I2S0.FIFO_CONF.fld.tx_data_num=32;
+
+	I2S0.CONF1.val=0;
+	I2S0.CONF1.fld.tx_stop_en=1;
+	I2S0.CONF1.fld.tx_pcm_bypass=1;
+
+	I2S0.CONF_CHAN.val=0;
+	I2S0.CONF_CHAN.fld.tx_chan_mod=1;
+	I2S0.CONF_CHAN.fld.rx_chan_mod=1;
 
 	//Invert WS to active-low
-	SET_PERI_REG_MASK(I2SCONF, I2S_TX_RIGHT_FIRST|I2S_RX_RIGHT_FIRST);
-	WRITE_PERI_REG(I2STIMING, 0);
+	I2S0.CONF.fld.tx_right_first=1;
+	I2S0.CONF.fld.rx_right_first=1;
+	
+	I2S0.TIMING.val=0;
 
 }
 
@@ -203,12 +203,12 @@ static void lcdIfaceInit() {
 //Send data to the LCD controller
 //high byte first, low second
 static void lcdData(int val) {
-	WRITE_PERI_REG(I2S_TX_FIFO, PACK32((val>>8)|0x0100, (val&0xff)|0x0100));
+	I2S0.TX_FIFO=PACK32((val>>8)|0x0100, (val&0xff)|0x0100);
 }
 
 //Set the index register in the LCD controller
 static void lcdCmd(int reg) {
-	WRITE_PERI_REG(I2S_TX_FIFO, PACK32((reg>>8), reg&0xff));
+	I2S0.TX_FIFO=PACK32((reg>>8), reg&0xff);
 }
 
 //Set a register in the LCD controller
@@ -225,23 +225,23 @@ static void lcdFlush() {
 	volatile int i;
 
 	//Transmit FIFO
-	SET_PERI_REG_MASK(I2SCONF, I2S_I2S_TX_START);
+	I2S0.CONF.fld.tx_start=1;
 
 	//Wait till fifo done
-	WRITE_PERI_REG(I2SINT_CLR, 0xFFFFFFFF);
-	while(!(READ_PERI_REG(I2SINT_RAW)&I2S_I2S_TX_REMPTY_INT_RAW)) ;
+	I2S0.INT_CLR.val=0xFFFFFFFF;
+	while(!(I2S0.INT_RAW.fld.tx_rempty_int_raw));
 	//Wait for last bytes to leave i2s xmit thing
 	//ToDo: poll bit in next hw
 	for (i=0; i<(1<<8); i++);
-	while(!(READ_PERI_REG(I2S_STATE)&I2S_I2S_TX_IDLE));
+	while(!(I2S0.STATE.fld.tx_idle));
 
-	CLEAR_PERI_REG_MASK(I2SCONF, I2S_I2S_TX_START);
-	SET_PERI_REG_MASK(I2SCONF,I2S_I2S_TX_RESET|I2S_I2S_TX_FIFO_RESET);
-	CLEAR_PERI_REG_MASK(I2SCONF,I2S_I2S_TX_RESET|I2S_I2S_TX_FIFO_RESET);
+	I2S0.CONF.fld.tx_start=0;
+	I2S0.CONF.fld.tx_reset=1; I2S0.CONF.fld.tx_fifo_reset=1;
+	I2S0.CONF.fld.tx_reset=0; I2S0.CONF.fld.tx_fifo_reset=0;
 
 	//Workaround: make sure hw doesn't forget 1st byte after reset
 	for (i=0; i<(1<<8); i++);
-	while((READ_PERI_REG(I2S_STATE)&I2S_I2S_TX_FIFO_RESET_BACK));
+	while(I2S0.STATE.fld.tx_fifo_reset_back);
 }
 
 
@@ -274,25 +274,26 @@ static void lcdInit() {
 
 static void finishDma() {
 	//No need to finish if no DMA transfer going on
-	if (!(READ_PERI_REG(I2S_FIFO_CONF)&I2S_I2S_DSCR_EN)) return;
+	if (!I2S0.FIFO_CONF.fld.dscr_en) return;
 
 	//Wait till fifo done
-	while(!(READ_PERI_REG(I2SINT_RAW)&I2S_I2S_TX_REMPTY_INT_RAW)) ;
+	while(!(I2S0.INT_RAW.fld.tx_rempty_int_raw)) ;
 	//Wait for last bytes to leave i2s xmit thing
 	//ToDo: poll bit in next hw
 //	for (i=0; i<(1<<8); i++);
-	while(!(READ_PERI_REG(I2S_STATE)&I2S_I2S_TX_IDLE));
+	while (!(I2S0.STATE.fld.tx_idle)) ;
 	
 	//Reset I2S for next transfer
-	CLEAR_PERI_REG_MASK(I2SCONF, I2S_I2S_TX_START);
-	CLEAR_PERI_REG_MASK(I2SOUT_LINK, I2S_I2S_OUTLINK_START);
+	I2S0.CONF.fld.tx_start=0;
+	I2S0.OUT_LINK.fld.outlink_start=0;
 
-	SET_PERI_REG_MASK(I2SCONF,I2S_I2S_TX_RESET|I2S_I2S_TX_FIFO_RESET);//|I2S_I2S_RX_FIFO_RESET);
-	CLEAR_PERI_REG_MASK(I2SCONF,I2S_I2S_TX_RESET|I2S_I2S_TX_FIFO_RESET);//|I2S_I2S_RX_FIFO_RESET);
+	
+	I2S0.CONF.fld.rx_reset=1; I2S0.CONF.fld.tx_reset=1;
+	I2S0.CONF.fld.rx_reset=0; I2S0.CONF.fld.tx_reset=0;
 
 //	for (i=0; i<(1<<8); i++);
-	while((READ_PERI_REG(I2S_STATE)&I2S_I2S_TX_FIFO_RESET_BACK));
-	CLEAR_PERI_REG_MASK(I2S_FIFO_CONF,I2S_I2S_DSCR_EN); //Disable DMA mode
+	while(I2S0.STATE.fld.tx_fifo_reset_back);
+	I2S0.FIFO_CONF.fld.dscr_en=0; //Disable DMA mode
 }
 
 
@@ -314,30 +315,28 @@ static void sendBufDma(uint16_t *buf, int len) {
 	dmaDesc.eof=1;
 
 	//Reset DMA
-	SET_PERI_REG_MASK(I2S_LC_CONF, I2S_I2S_IN_RST | I2S_I2S_OUT_RST|I2S_I2S_AHBM_RST|I2S_I2S_AHBM_FIFO_RST);
-	CLEAR_PERI_REG_MASK(I2S_LC_CONF, I2S_I2S_IN_RST | I2S_I2S_OUT_RST|I2S_I2S_AHBM_RST|I2S_I2S_AHBM_FIFO_RST);
-
+	I2S0.LC_CONF.fld.in_rst=1; I2S0.LC_CONF.fld.out_rst=1; I2S0.LC_CONF.fld.ahbm_rst=1; I2S0.LC_CONF.fld.ahbm_fifo_rst=1;
+	I2S0.LC_CONF.fld.in_rst=0; I2S0.LC_CONF.fld.out_rst=0; I2S0.LC_CONF.fld.ahbm_rst=0; I2S0.LC_CONF.fld.ahbm_fifo_rst=0;
+	
 	//Reset I2S FIFO
-	SET_PERI_REG_MASK(I2SCONF,I2S_I2S_TX_RESET|I2S_I2S_TX_FIFO_RESET|I2S_I2S_RX_FIFO_RESET);
-	CLEAR_PERI_REG_MASK(I2SCONF,I2S_I2S_TX_RESET|I2S_I2S_TX_FIFO_RESET|I2S_I2S_RX_FIFO_RESET);
-
+	I2S0.CONF.fld.tx_reset=1; I2S0.CONF.fld.tx_fifo_reset=1; I2S0.CONF.fld.rx_fifo_reset=1; 
+	I2S0.CONF.fld.tx_reset=0; I2S0.CONF.fld.tx_fifo_reset=0; I2S0.CONF.fld.rx_fifo_reset=0; 
 
 	//Set desc addr
-	CLEAR_PERI_REG_MASK(I2SOUT_LINK, I2S_I2S_OUTLINK_ADDR);
-	SET_PERI_REG_MASK(I2SOUT_LINK, ((uint32_t)(&dmaDesc))&I2S_I2S_OUTLINK_ADDR);
+	I2S0.OUT_LINK.fld.outlink_addr=((uint32_t)(&dmaDesc))&I2S_I2S_OUTLINK_ADDR;
 
-	SET_PERI_REG_MASK(I2S_FIFO_CONF,I2S_I2S_DSCR_EN); //Enable DMA mode
+	I2S0.FIFO_CONF.fld.dscr_en=1;
 
 	//Enable and configure DMA
-	WRITE_PERI_REG(I2S_LC_CONF, I2S_I2S_OUT_DATA_BURST_EN | I2S_I2S_CHECK_OWNER | I2S_I2S_OUT_EOF_MODE | I2S_I2S_OUTDSCR_BURST_EN|I2S_I2S_OUT_DATA_BURST_EN);
+	I2S0.LC_CONF.val=I2S_I2S_OUT_DATA_BURST_EN | I2S_I2S_CHECK_OWNER | I2S_I2S_OUT_EOF_MODE | I2S_I2S_OUTDSCR_BURST_EN|I2S_I2S_OUT_DATA_BURST_EN;
 	
 
 	//Start transmission
-	SET_PERI_REG_MASK(I2SOUT_LINK, I2S_I2S_OUTLINK_START);
+	I2S0.OUT_LINK.fld.outlink_start=1;
 
-	SET_PERI_REG_MASK(I2SCONF, I2S_I2S_TX_START);
+	I2S0.CONF.fld.tx_start=1;
 	//Clear int flags
-	WRITE_PERI_REG(I2SINT_CLR, 0xFFFFFFFF);
+	I2S0.INT_CLR.val=0xFFFFFFFF;
 }
 
 #define DMALEN 512 //Bug: >64 samples b0rks the i2s module for now.
