@@ -9,6 +9,9 @@
 
 COMPONENT_EXTRA_CLEAN := test_tjpgd_logo.h
 
+COMPONENT_ADDLDFLAGS = -Wl,--whole-archive -l$(COMPONENT_NAME) -Wl,--no-whole-archive
+
+
 include $(SDK_PATH)/Makefile
 
 test_tjpgd.o: test_tjpgd_logo.h
