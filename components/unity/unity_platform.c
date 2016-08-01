@@ -2,7 +2,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "unity.h"
-#include "ets_sys.h"
+#include "rom/ets_sys.h"
 
 #define unity_printf ets_printf
 

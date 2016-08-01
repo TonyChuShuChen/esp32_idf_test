@@ -1,11 +1,12 @@
 #include <string.h>
+#include <stdbool.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/reent.h>
 #include <stdlib.h>
-#include "libc_stubs.h"
+#include "rom/libc_stubs.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
 #include "freertos/task.h"

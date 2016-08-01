@@ -2,23 +2,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "c_types.h"
-#include "ets_sys.h"
-#include "osapi.h"
+
+#include "rom/ets_sys.h"
+#include "rom/lldesc.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "freertos/queue.h"
 #include "freertos/xtensa_api.h"
+
 #include "unity.h"
+
 #include "soc/uart_register.h"
 #include "soc/dport_reg.h"
 #include "soc/io_mux_reg.h"
-
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_reg.h"
 #include "soc/gpio.h"
-#include <i2s/i2s_reg.h>
-#include <lldesc/lldesc.h>
+#include "soc/i2s_reg.h"
 
 
 #define DPORT_I2S0_CLK_EN   (BIT(4))

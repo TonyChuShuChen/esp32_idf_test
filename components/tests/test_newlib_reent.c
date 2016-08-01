@@ -3,9 +3,10 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "c_types.h"
-#include "ets_sys.h"
-#include "osapi.h"
+#include "rom/ets_sys.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
@@ -15,7 +16,7 @@
 #include "soc/uart_register.h"
 #include "soc/dport_reg.h"
 #include "soc/io_mux_reg.h"
-#include <stdlib.h>
+
 
 volatile static int done;
 volatile static int error;

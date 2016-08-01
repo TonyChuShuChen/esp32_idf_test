@@ -4,8 +4,8 @@
 
 #include <stdio.h>
 #include "c_types.h"
-#include "ets_sys.h"
-#include "osapi.h"
+#include "rom/ets_sys.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"

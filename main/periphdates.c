@@ -1,15 +1,13 @@
+#include <stdio.h>
+
 #include "c_types.h"
-#include "ets_sys.h"
-#include "osapi.h"
-#include "slc/slc_register_v7.h"
-#include "slc/slc_host_register.h"
+#include "rom/ets_sys.h"
+
 #include "soc/rtc_cntl_reg.h"
 #include "soc/dport_reg.h"
 #include "soc/gpio_sd_reg.h"
 #include "soc/efuse_reg.h"
 #include "soc/rtc_io_reg.h"
-
-#define printf os_printf
 
 void checkPeriphDates() {
 	if (READ_PERI_REG(DPORT_REG_DATE)!=DPORT_DPORT_DATE_VERSION) printf("DPORT_REG_DATE mismatch! hwver %x != incver %x\n", READ_PERI_REG(DPORT_REG_DATE), DPORT_DPORT_DATE_VERSION);

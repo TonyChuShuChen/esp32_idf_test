@@ -1,7 +1,7 @@
 
 
 #include <stdio.h>
-#include <miniz.h>
+#include "rom/miniz.h"
 #include "unity.h"
 
 

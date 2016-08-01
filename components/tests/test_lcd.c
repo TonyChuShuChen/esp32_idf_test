@@ -5,11 +5,9 @@
 
 #include <stdio.h>
 #include "c_types.h"
-#include "ets_sys.h"
-#include "osapi.h"
-#include "soc/uart_register.h"
-#include "soc/dport_reg.h"
-#include "soc/io_mux_reg.h"
+
+#include "rom/ets_sys.h"
+#include "rom/lldesc.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -17,15 +15,16 @@
 #include "freertos/queue.h"
 #include "freertos/xtensa_api.h"
 
+#include "soc/uart_register.h"
+#include "soc/dport_reg.h"
+#include "soc/io_mux_reg.h"
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_reg.h"
 #include "soc/gpio.h"
-#include <lldesc/lldesc.h>
+#include "soc/i2s_reg.h"
 
 #include <math.h>
 #include "unity.h"
-
-#include <i2s/i2s_reg.h>
 
 #include "periph_i2s.h"
 
