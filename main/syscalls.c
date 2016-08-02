@@ -120,39 +120,15 @@ int _open_r(struct _reent *r, const char * path, int flags, int mode) {
     return 0;
 }
 
-static int ets_putchar(int c)
-{
-    if (c == '\n') 
-    {
-        uart_tx_one_char('\n');
-        uart_tx_one_char('\r');
-    }
-    else if (c == '\r') 
-    {
-    }
-    else 
-    {
-        uart_tx_one_char(c);
-    }
-    return c;
-}
-
 ssize_t _write_r(struct _reent *r, int fd, const void * data, size_t size) {
 	const char* p = (const char*) data;
     if (fd == STDOUT_FILENO) {
         while(size--) {
-            ets_putchar(*p);
+            uart_tx_one_char(*p);
             ++p;
         }
     }
     return size;
-}
-
-int _putc_r(struct _reent* r, int c, FILE* file) {
-    if (file->_file == STDOUT_FILENO) {
-        return ets_putchar(c);
-    }
-    return EOF;
 }
 
 _off_t _lseek_r(struct _reent *r, int fd, _off_t size, int mode) {
