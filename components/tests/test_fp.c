@@ -4,7 +4,7 @@
 #include "freertos/task.h"
 #include "unity.h"
 
-
+#if CONFIG_FP_TEST_ENABLE
 static float addsf(float a, float b)
 {
     float result;
@@ -196,3 +196,4 @@ TEST_CASE("context switch saves FP registers", "[fp]")
     }
     TEST_ASSERT(state.fail == 0);
 }
+#endif
