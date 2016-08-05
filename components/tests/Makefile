@@ -9,8 +9,9 @@
 
 COMPONENT_EXTRA_CLEAN := test_tjpgd_logo.h
 
-COMPONENT_ADDLDFLAGS = -Wl,--whole-archive -l$(COMPONENT_NAME) -Wl,--no-whole-archive
+COMPONENT_ADD_LDFLAGS = -Wl,--whole-archive -l$(COMPONENT_NAME) -Wl,--no-whole-archive
 
+COMPONENT_DEPENDS = unity
 
 include $(SDK_PATH)/make/component.mk
 
