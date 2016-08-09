@@ -3,8 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "c_types.h"
+
 #include "rom/ets_sys.h"
 #include "rom/lldesc.h"
+#include "rom/gpio.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -18,7 +20,6 @@
 #include "soc/io_mux_reg.h"
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_reg.h"
-#include "soc/gpio.h"
 #include "soc/i2s_reg.h"
 
 
