@@ -5,6 +5,5 @@
 
 PROJECT_NAME := testje
 
-
-include $(SDK_PATH)/Makefile
+include $(SDK_PATH)/make/project.mk
 
