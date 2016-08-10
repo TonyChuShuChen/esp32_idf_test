@@ -2,8 +2,8 @@
  Test for multicore FreeRTOS. This test spins up threads, fiddles with queues etc.
 */
 
+#include <esp_types.h>
 #include <stdio.h>
-#include "c_types.h"
 #include "rom/ets_sys.h"
 
 #include "freertos/FreeRTOS.h"

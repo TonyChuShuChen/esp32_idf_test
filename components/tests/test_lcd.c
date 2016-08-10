@@ -3,9 +3,8 @@
 
 */
 
+#include <esp_types.h>
 #include <stdio.h>
-#include "c_types.h"
-
 #include "rom/ets_sys.h"
 #include "rom/lldesc.h"
 #include "rom/gpio.h"
