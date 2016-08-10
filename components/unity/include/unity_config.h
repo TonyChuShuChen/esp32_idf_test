@@ -7,6 +7,8 @@
 
 // Adapt Unity to our environment, disable FP support
 
+#include <esp_err.h>
+
 #define UNITY_EXCLUDE_FLOAT
 #define UNITY_EXCLUDE_DOUBLE
 
@@ -65,7 +67,9 @@ void unity_run_all_tests();
 	}\
 	static void UNITY_TEST_UID(test_func_) (void)
 
-
+// shorthand to check esp_err_t return code
+#define TEST_ESP_OK(rc)	TEST_ASSERT_EQUAL_INT32(ESP_OK, rc)
+#define TEST_ESP_ERR(err, rc) TEST_ASSERT_EQUAL_INT32(err, rc)
 
 
 #endif //UNITY_CONFIG_H
