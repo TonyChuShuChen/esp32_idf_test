@@ -3,7 +3,7 @@
 #include <freertos/task.h>
 #include <unity.h>
 #include <esp_spi_flash.h>
-#include <attr.h>
+#include <esp_attr.h>
 
 struct flash_write_test_ctx {
     bool terminate;
