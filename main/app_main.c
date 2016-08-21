@@ -4,6 +4,8 @@
 #include "unity.h"
 
 
+#include "driver_test_entry.h"
+
 void unityTask(void *pvParameters) 
 {
     vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -13,6 +15,9 @@ void unityTask(void *pvParameters)
 
 void app_main() 
 {
-    xTaskCreatePinnedToCore(unityTask, "unityTask", 2048, NULL, 5, NULL, 0);
+   // xTaskCreatePinnedToCore(unityTask, "unityTask", 2048, NULL, 5, NULL, 0);
+    xTaskCreate(driver_test,"driver_test",2048,NULL,5,NULL);
+
+	
 }
 

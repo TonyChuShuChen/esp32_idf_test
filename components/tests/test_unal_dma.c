@@ -5,7 +5,6 @@
 #include <string.h>
 #include "rom/ets_sys.h"
 #include "rom/lldesc.h"
-#include "rom/gpio.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -19,6 +18,8 @@
 #include "soc/io_mux_reg.h"
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_reg.h"
+
+#include "driver/gpio.h"
 #include "soc/i2s_reg.h"
 
 
@@ -58,7 +59,7 @@ static void dmaMemcpy(void *in, void *out, int len) {
 	WRITE_PERI_REG(GPIO_FUNC20_OUT_SEL_CFG_REG, (155<<GPIO_FUNC0_OUT_SEL_S));
 	WRITE_PERI_REG(GPIO_FUNC26_OUT_SEL_CFG_REG, (156<<GPIO_FUNC0_OUT_SEL_S)); //RS
 	WRITE_PERI_REG(GPIO_FUNC11_OUT_SEL_CFG_REG, (I2S0O_WS_OUT_IDX<<GPIO_FUNC0_OUT_SEL_S));
-//	WRITE_PERI_REG(GPIO_FUNC11_OUT_SEL_CFG, (I2S0O_BCK_OUT_IDX<<GPIO_GPIO_FUNC0_OUT_SEL_S));
+//	WRITE_PERI_REG(GPIO_FUNC11_OUT_SEL_CFG, (I2S0O_BCK_OUT_IDX<<GPIO_FUNC0_OUT_SEL_S));
 
 	//GPIO_SET_GPIO_FUNC11_OUT_INV_SEL(1); //old
 	WRITE_PERI_REG(GPIO_FUNC11_OUT_SEL_CFG_REG, READ_PERI_REG(GPIO_FUNC11_OUT_SEL_CFG_REG)|GPIO_FUNC11_OUT_INV_SEL);
